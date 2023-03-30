@@ -10,11 +10,11 @@ app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.urlencoded({ extended: true })); // use body-parser
 
 app.get("/", (req, res) => {
-  res.render("login");
+  res.render("login-page");
 });
 
 app.get("/login", (req, res) => {
-  res.render("index");
+  res.render("login");
 });
 
 app.get("/index", (req, res) => {
@@ -26,16 +26,16 @@ app.post("/login", (req, res) => {
   const { name, password } = req.body;
 
   if (name === "admin" && password === "admin") {
-    res.render("success", {
+    res.render("registration-successfully", {
       username: name,
     });
   } else {
-    res.render("failure");
+    res.render("login-failure");
   }
 
 });
-app.get("/index2", (req, res) => {
-  res.render("index2");
+app.get("/register", (req, res) => {
+  res.render("register");
 });
 
 app.post("/register", (req, res) => {
@@ -45,7 +45,7 @@ app.post("/register", (req, res) => {
       username: name,
     });
   } else {
-    res.render("registered");
+    res.render("user-already-registered");
   }
 });
 
