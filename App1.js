@@ -1,9 +1,8 @@
 const express = require("express");
+const fs = require("fs");
 const app = express();
 const path = require("path");
-// const router = express.Router();
 const bodyParser = require("body-parser"); // add body-parser module
-
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 
@@ -17,43 +16,61 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
-app.get("/index", (req, res) => {
-  res.render("failure");
-});
 
 
 app.post("/login", (req, res) => {
   const { name, password } = req.body;
-
-  if (name === "admin" && password === "admin") {
-    res.render("registration-successfully", {
-      username: name,
+  const registeredUsers = require("./users.json");
+  const foundUser = registeredUsers.find(user => user.name === name && user.password === password);
+  if (foundUser) {
+    res.render("login-successfully", {
+      username: foundUser.name,
     });
   } else {
     res.render("login-failure");
   }
-
 });
+
+
+
 app.get("/register", (req, res) => {
   res.render("register");
 });
 
+
 app.post("/register", (req, res) => {
   const { name, password } = req.body;
-  if (name != "admin" && password != "admin") {
-    res.render("register", {
+  const registeredUsers = require("./users.json");
+  const foundUser = registeredUsers.find(user => user.name === name);
+  if (foundUser) {
+    res.render("user-already-registered");
+  } else {
+    const newUser = { name, password };
+    registeredUsers.push(newUser);
+    fs.writeFile("users.json", JSON.stringify(registeredUsers), (err) => {
+      if (err) throw err;
+      console.log("Registered users saved to users.json");
+    });
+    res.render("registration-successfully", {
       username: name,
     });
-  } else {
-    res.render("user-already-registered");
   }
 });
+
+
+app.get("/registration-successfully", (req, res) => {
+  const { username } = req.query;
+  res.render("registration-successfully", {
+    username,
+  });
+});
+
 
 app.get("/about", (req, res) => {
   res.render("about", { title: "About", message: "The about is getting rendered" });
 });
 
-// app.use("/", router);
+
 app.listen(process.env.PORT || 4000, () => { 
   console.log("Running at Port 4000");
 });
